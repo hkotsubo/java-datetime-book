@@ -14,10 +14,12 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.IllegalInstantException;
 import org.joda.time.Instant;
+import org.joda.time.Interval;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalDateTime;
 import org.joda.time.LocalTime;
 import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.joda.time.Years;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -27,6 +29,8 @@ import org.joda.time.format.DateTimePrinter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
+
+import exemplos.setup.Setup;
 
 /**
  * Exemplos com a biblioteca Joda-Time.
@@ -55,9 +59,10 @@ public class JodaTimeExemplos {
         comparacaoJavaTimeHorarioDeVerao();
         comparacaoJavaTimeFormatacao();
         comparacaoJavaTimeTests();
-        formatarPeriodos();
+        duracoes();
         calculaIdadeNascido29Fev();
         converterParaDate();
+        intervalos();
     }
 
     static void funcionamentoBasico() {
@@ -313,7 +318,8 @@ public class JodaTimeExemplos {
         DateTimeUtils.setCurrentMillisSystem(); // usar relógio do sistema para obter data/hora atual
     }
 
-    static void formatarPeriodos() {
+    static void duracoes() {
+        // Joda-time possui uma classe dedicada para formatar durações
         PeriodFormatter formatter = new PeriodFormatterBuilder()
             // horas, com um sufixo para singular e outro para plural
             .appendHours()
@@ -334,6 +340,20 @@ public class JodaTimeExemplos {
         System.out.println(formatter.print(period)); // 10 horas 20 minutos 1 segundo
 
         // infelizmente, esta ideia não foi usada no java.time (onde a formatação de períodos deve ser feita manualmente)
+
+        // ---------------------------------------
+        // A norma ISO 8601 não permite durações com a quantidade de semanas misturada com as demais unidades, mas o Joda-time aceita
+        period = Period.parse("P2W1D"); // 2 semanas e 1 dia
+        System.out.println(period); // P2W1D
+
+        // O java.time converte semanas para dias
+        java.time.Period javatimePeriod = java.time.Period.parse("P2W1D"); // 2 semanas e 1 dia
+        System.out.println(javatimePeriod); // P15D <- 2 semanas e 1 dia, convertida em 15 dias
+
+        // Mas o Joda-time possui uma forma de converter as semanas em dias
+        PeriodType type = PeriodType.yearMonthDay(); // tipo de normalização com anos, meses e dias
+        period = period.normalizedStandard(type);
+        System.out.println(period); // P15D
     }
 
     /**
@@ -374,5 +394,29 @@ public class JodaTimeExemplos {
         dateTime = new DateTime(calendar);
         // converter de volta para Calendar
         calendar = dateTime.toGregorianCalendar();
+    }
+
+    /**
+     * Outra ideia que não foi aproveitada no java.time são os intervalos. Mas é possível ter essa funcionalidade usando a biblioteca Threeten Extra, veja
+     * exemplos em {@link ThreetenExtraExemplos#intervalos()}
+     */
+    public static void intervalos() {
+        // data/hora "atual" simulada: 4 de Maio de 2018, às 17:00 em São Paulo
+        DateTime inicio = new DateTime(Setup.clock().millis());
+        DateTime fim = inicio.plusDays(90).plusHours(10).plusSeconds(382932);
+        // intervalo entre as datas
+        Interval intervalo = new Interval(inicio, fim);
+        // imprime no formato ISO 8601: https://en.wikipedia.org/wiki/ISO_8601#Time_intervals
+        System.out.println(intervalo); // 2018-05-04T17:00:00.000-03:00/2018-08-07T13:22:12.000-03:00
+
+        // duração do intervalo
+        System.out.println(intervalo.toPeriod()); // P3M2DT20H22M12S (3 meses, 2 dias, 20 horas, 22 minutos e 12 segundos)
+        // datas de início e fim
+        System.out.println(intervalo.getStart()); // 2018-05-04T17:00:00.000-03:00
+        System.out.println(intervalo.getEnd()); // 2018-08-07T13:22:12.000-03:00
+
+        // verifica se uma data está dentro do intervalo
+        DateTime dt = inicio.plusDays(30);
+        System.out.println(intervalo.contains(dt)); // true
     }
 }

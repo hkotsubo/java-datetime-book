@@ -21,7 +21,6 @@ import java.util.TimeZone;
 
 import exemplos.setup.Setup;
 
-// trata da classe java.time.Instant e como usar java.time.temporal.TemporalField e java.time.temporal.ChronoField
 public class Cap17Formatacao {
 
     static {

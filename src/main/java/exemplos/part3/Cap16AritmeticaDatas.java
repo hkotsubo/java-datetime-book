@@ -13,7 +13,6 @@ import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.UnsupportedTemporalTypeException;
 
-// trata da classe java.time.Instant e como usar java.time.temporal.TemporalField e java.time.temporal.ChronoField
 public class Cap16AritmeticaDatas {
 
     static {

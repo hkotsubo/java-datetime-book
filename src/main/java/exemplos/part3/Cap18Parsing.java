@@ -30,7 +30,6 @@ import java.util.Set;
 
 import exemplos.part2.Cap08e09FormatacaoParsing;
 
-// trata da classe java.time.Instant e como usar java.time.temporal.TemporalField e java.time.temporal.ChronoField
 public class Cap18Parsing {
 
     static {
