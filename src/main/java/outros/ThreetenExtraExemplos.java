@@ -10,6 +10,7 @@ import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.threeten.extra.Interval;
 import org.threeten.extra.PeriodDuration;
@@ -30,6 +31,7 @@ public class ThreetenExtraExemplos {
         periodDurationJuntos();
         intervalos();
         parseVariosFormatters();
+        outros();
     }
 
     /**
@@ -111,9 +113,12 @@ public class ThreetenExtraExemplos {
         // o código abaixo é equivalente: o instante final também é 10 horas depois do inicial
         intervalo = Interval.of(inicio, inicio.plus(10, ChronoUnit.HOURS));
 
-        // também é possível simular um intervalo só com Instante inicial
+        // também é possível simular um intervalo só com instante inicial
         intervalo = Interval.of(inicio, Instant.MAX);
         System.out.println(intervalo.isUnboundedEnd()); // true (não tem instante final)
+        // ou um intervalo sem início (só com o instante final)
+        intervalo = Interval.of(Instant.MIN, fim);
+        System.out.println(intervalo.isUnboundedStart()); // true (não tem instante inicial)
     }
 
     static void parseVariosFormatters() {
@@ -133,5 +138,25 @@ public class ThreetenExtraExemplos {
         // O método tenta fazer o parsing com fmt1, fmt2 e fmt3 (ele para no primeiro que der certo)
         // O resultado é determinado pelo segundo parâmetro, que é um TemporalQuery (no caso, usei o method reference LocalDate::from)
         System.out.println(dt); // 2018-05-04
+    }
+
+    static void outros() {
+        // conversões entre ChronoUnit e TimeUnit
+        ChronoUnit chronoUnit = Temporals.chronoUnit(TimeUnit.HOURS);
+        System.out.println(chronoUnit); // Hours
+        try {
+            // lança exceção, pois TimeUnit não possui equivalente para YEARS
+            TimeUnit timeUnit = Temporals.timeUnit(ChronoUnit.YEARS);
+            System.out.println(timeUnit);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage()); // ChronoUnit cannot be converted to TimeUnit: Years
+        }
+
+        // TemporalAdjuster para dias úteis (considerando que dias úteis são: de segunda a sexta)
+        LocalDate date = LocalDate.of(2018, 5, 4); // 2018-05-04
+        // próximo dia útil
+        System.out.println(date.with(Temporals.nextWorkingDay())); // 2018-05-07
+        // dia útil anterior
+        System.out.println(date.with(Temporals.previousWorkingDay())); // 2018-05-03
     }
 }
