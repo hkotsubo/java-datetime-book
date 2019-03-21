@@ -118,7 +118,7 @@ public class Cap13PrincipiosBasicos {
             .withMinute(30);
 
         System.out.println(dataModificada); // 2015-05-01T10:30:35.123
-        // "datHora" permanece inalterada
+        // "dataHora" permanece inalterada
         System.out.println(dataHora); // 2018-05-04T17:00:35.123
     }
 

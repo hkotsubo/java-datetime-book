@@ -29,8 +29,13 @@ import org.joda.time.Years;
 
 /**
  * A primeira parte do livro não possui código propriamente dito, mas fiz alguns códigos em Java para ilustrar os exemplos do livro.
+ * 
+ * Se não está familiarizado com a API java.time não se preocupe em entender os códigos agora, pois estas classes são explicadas na parte 3. Os códigos que
+ * estão aqui servem apenas para demonstrar alguns conceitos citados no livro.
+ * 
+ * Como a primeira parte do livro é mais conceitual, não há tanto código associado, então esta classe cobre os capítulos 1 a 6.
  */
-public class Main {
+public class Capitulos1a6 {
 
     static {
         // setar configurações, ver javadoc da classe Setup para mais detalhes
@@ -436,5 +441,4 @@ public class Main {
             });
         });
     }
-
 }
