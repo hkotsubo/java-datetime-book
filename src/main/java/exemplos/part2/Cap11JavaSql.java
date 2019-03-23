@@ -47,6 +47,7 @@ public class Cap11JavaSql {
         compararNormalizado();
         parse();
         parseTimestamp();
+        parseTimestampFracaoSegundosVariavel();
     }
 
     static void dataHoraMudaConformeTimezone() {
@@ -182,5 +183,22 @@ public class Cap11JavaSql {
         System.out.println(ts); // 2018-05-04 10:30:45.123456789
         System.out.println(ts.getTime()); // 1525440645123
         System.out.println(ts.getNanos()); // 123456789
+    }
+
+    // exemplo que não tem no livro, trata fração de segundos com qualquer quantidade de dígitos
+    static void parseTimestampFracaoSegundosVariavel() throws ParseException {
+        String input = "04/05/2018 10:30:45.12345";
+        // separar frações de segundo do restante da data/hora
+        String[] dadosSeparados = input.split("\\.");
+        // fazer parsing da data/hora (sem os nanossegundos)
+        SimpleDateFormat parser = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        Date date = parser.parse(dadosSeparados[0]);
+        // usar o valor do timestamp no construtor
+        Timestamp ts = new Timestamp(date.getTime());
+        // setar os nanossegundos (preencher a string com zeros à direita para completar os 9 dígitos)
+        ts.setNanos(Integer.parseInt(String.format("%-9s", dadosSeparados[1]).replaceAll(" ", "0")));
+        System.out.println(ts); // 2018-05-04 10:30:45.12345
+        System.out.println(ts.getTime()); // 1525440645123
+        System.out.println(ts.getNanos()); // 123450000
     }
 }
