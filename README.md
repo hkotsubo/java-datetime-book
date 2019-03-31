@@ -11,7 +11,13 @@ Os pacotes seguem a mesma divisão dos capítulos:
 - `exemplos.part1`: como esta parte é mais conceitual, os códigos são apenas para ilustrar alguns conceitos
 - `exemplos.part2`: mostra a API legada (`java.util.Date`, `Calendar`, `SimpleDateFormat` etc)
 - `exemplos.part3`: foca na API `java.time`
+
+Todos os exemplos usam o pacote `exemplos.setup` para fazer as configurações iniciais.
+
+Existem ainda pacotes adicionais, com códigos que não estão no livro:
+
 - `outros`: Joda-time e Threeten Backport, duas bibliotecas que são apenas mencionadas no livro. Este pacote possui alguns exemplos de uso destas APIs.
+- `mysql`: contém exemplos com o pacote `java.sql`, usando o banco MySQL.
 
 ---
 ### Configurações
