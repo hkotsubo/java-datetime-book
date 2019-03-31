@@ -33,6 +33,9 @@ import exemplos.setup.Setup;
  * Sempre leia a documentação antes de decidir qual tipo usar (DATE, DATETIME, TIMESTAMP, TIMESTAMP WITH TIMEZONE, etc). Apesar de terem os mesmos nomes, cada
  * tipo pode ter comportamentos diferentes dependendo do banco, e as configurações de timezone (tanto do servidor quanto da conexão) podem influenciar no
  * resultado final (na data que você grava e na que você obtém quando consulta).
+ * 
+ * Como o objetivo foi mostrar o comportamento dos campos de data, este código deliberadamente não está seguindo as "boas práticas", então o main tem um "throws
+ * Exception". Desculpe, mas quis focar no mecanismo que envolve as datas e timezones, deixando as burocracias do JDBC um pouco de lado.
  */
 public class MysqlTests {
 
