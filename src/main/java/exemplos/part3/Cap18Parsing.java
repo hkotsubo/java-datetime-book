@@ -22,8 +22,10 @@ import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
 import java.time.temporal.TemporalAccessor;
 import java.time.temporal.TemporalQuery;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -56,6 +58,7 @@ public class Cap18Parsing {
         anoCom2Digitos();
         parseMicrosoftJSONDate();
         parseGmtOffset();
+        formatosISO8601();
     }
 
     static void exemplosBasicos() {
@@ -673,5 +676,66 @@ public class Cap18Parsing {
         parser = DateTimeFormatter.ofPattern("dd MMM yyyy HH:mm:ss O ", Locale.ENGLISH);
         OffsetDateTime odt = OffsetDateTime.parse(input, parser);
         System.out.println(odt); // 2018-07-08T13:34:21-08:00
+    }
+
+    /**
+     * Parser para várias opções diferentes do formato ISO 8601
+     */
+    static void formatosISO8601() {
+        List<String> list = Arrays.asList("2018-02-10T10:30:45.143923Z", "2018-02-10T10:30:45.561-0100", "2018-02-10T10:30:45+05:30", "2018-02-10T10:30:45",
+                "2018-02-10");
+        // opção 1: tentar obter o tipo mais adequado
+        list.forEach(Cap18Parsing::parseBest);
+        // opção 2: sempre obter OffsetDateTime (preencher campos faltantes com valores default)
+        list.forEach(Cap18Parsing::parseDefaultValues);
+    }
+
+    private static void parseBest(String s) {
+        DateTimeFormatter parser = new DateTimeFormatterBuilder()
+            // data
+            .append(DateTimeFormatter.ISO_LOCAL_DATE)
+            .optionalStart() // hora e offset opcionais
+            .appendLiteral('T')
+            .append(DateTimeFormatter.ISO_LOCAL_TIME)
+            .optionalStart() // offset opcional
+            // aceitar offset HH:MM, HHMM ou HH
+            .appendPattern("[XXX][XX][X]")
+            .optionalEnd() // offset opcional
+            .optionalEnd() // hora e offset opcionais
+            // criar o parser
+            .toFormatter();
+        // parseBest tenta aplicar as TemporalQueries na sequência:
+        // primeiro tenta criar um OffsetDateTime, se não der, tenta LocalDateTime e por fim, tenta LocalDate
+        TemporalAccessor dt = parser.parseBest(s, OffsetDateTime::from, LocalDateTime::from, LocalDate::from);
+        // opcionalmente, você pode testar o tipo retornado
+        if (dt instanceof OffsetDateTime) {
+            System.out.println("Retornou OffsetDateTime: " + dt);
+        } else if (dt instanceof LocalDateTime) {
+            System.out.println("Retornou LocalDateTime: " + dt);
+        } else if (dt instanceof LocalDate) {
+            System.out.println("Retornou LocalDate: " + dt);
+        }
+    }
+
+    // sempre obtém OffsetDateTime, preenchendo os campos faltantes com valores default
+    private static void parseDefaultValues(String s) {
+        DateTimeFormatter parser = new DateTimeFormatterBuilder()
+            // data
+            .append(DateTimeFormatter.ISO_LOCAL_DATE)
+            .optionalStart() // hora e offset opcionais
+            .appendLiteral('T')
+            .append(DateTimeFormatter.ISO_LOCAL_TIME)
+            .optionalStart() // offset opcional
+            // aceitar offset HH:MM, HHMM ou HH
+            .appendPattern("[XXX][XX][X]")
+            .optionalEnd() // offset opcional
+            .optionalEnd() // hora e offset opcionais
+            // valor default para a hora (meia-noite)
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+            // valor default para o offset (-03:00)
+            .parseDefaulting(ChronoField.OFFSET_SECONDS, ZoneOffset.ofHours(-3).getTotalSeconds())
+            // criar o parser
+            .toFormatter();
+        System.out.println(OffsetDateTime.parse(s, parser));
     }
 }
