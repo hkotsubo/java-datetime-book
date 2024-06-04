@@ -45,7 +45,7 @@ public class MysqlTests {
     }
 
     public static void main(String[] args) throws Exception {
-        Class.forName("com.mysql.jdbc.Driver").newInstance();
+        Class.forName("com.mysql.cj.jdbc.Driver").newInstance();
 
         apagaTudo(); // só pra não poluir a tabela de testes, pode comentar essa linha se quiser
 
@@ -78,62 +78,31 @@ public class MysqlTests {
     }
 
     static void insertDate(long id, int dia, int mes, int ano, int hora, int minuto, String timezone) throws Exception {
-        Connection conn = null;
-        PreparedStatement st = null;
-        try {
-            conn = connect(timezone);
-            st = conn.prepareStatement("insert into exemplo (id, data_ts, data) values (? , ? , ? )");
+        try (Connection conn = connect(timezone);
+             PreparedStatement st = conn.prepareStatement("insert into exemplo (id, data_ts, data) values (? , ? , ? )")) {
             st.setLong(1, id);
             st.setTimestamp(2, createTimestamp(dia, mes, ano, hora, minuto));
             st.setDate(3, createDate(dia, mes, ano));
             st.executeUpdate();
-        } finally {
-            if (st != null) {
-                st.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
         }
     }
 
     static void select(String timezone) throws Exception {
-        Connection conn = null;
-        PreparedStatement st = null;
-        ResultSet rs = null;
-        try {
-            conn = connect(timezone);
-            st = conn.prepareStatement("select * from exemplo");
-            rs = st.executeQuery();
+        try (Connection conn = connect(timezone);
+             PreparedStatement st = conn.prepareStatement("select * from exemplo");
+             ResultSet rs = st.executeQuery()) {
             while (rs.next()) {
                 Timestamp timestamp = rs.getTimestamp("data_ts");
                 Date data = rs.getDate("data");
                 System.out.printf("id=%s, data_ts=%s (%d), data=%s (%d)\n", rs.getLong("id"), timestamp, timestamp.getTime(), data, data.getTime());
             }
-        } finally {
-            if (st != null) {
-                st.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
         }
     }
 
     static void apagaTudo() throws Exception {
-        Connection conn = null;
-        PreparedStatement st = null;
-        try {
-            conn = connect(TimeZone.getDefault().getID());
-            st = conn.prepareStatement("delete from exemplo");
+        try (Connection conn = connect(TimeZone.getDefault().getID());
+             PreparedStatement st = conn.prepareStatement("delete from exemplo")) {
             st.executeUpdate();
-        } finally {
-            if (st != null) {
-                st.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
         }
     }
 
